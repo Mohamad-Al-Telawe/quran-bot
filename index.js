@@ -7,7 +7,7 @@ import fs from 'fs';
 const app = express();
 
 // ✅ التحقق من وجود التوكن
-const token = process.env.TOKEN;
+const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A';
 if (!token) {
   console.error('❌ متغير TOKEN غير موجود. تأكد من إضافته في Railway > Variables');
   process.exit(1);
