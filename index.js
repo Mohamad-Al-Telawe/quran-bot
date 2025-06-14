@@ -12,6 +12,12 @@ const bot = new TelegramBot(token, { polling: true });
 const adapter = new JSONFile('db.json');
 const db = new Low(adapter);
 
+if (!token) {
+  console.error('❌ متغير TOKEN غير موجود. تأكد من إضافته في Railway > Variables');
+  process.exit(1); // أوقف البرنامج
+}
+
+
 // تحميل البيانات أو إنشاؤها
 async function initDB() {
   await db.read();
