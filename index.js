@@ -15,9 +15,12 @@ const db = new Low(adapter);
 // تحميل البيانات أو إنشاؤها
 async function initDB() {
   await db.read();
-  db.data ||= { students: [] };
-  await db.write();
+  if (!db.data) {
+    db.data = { students: [] }; // البيانات الابتدائية
+    await db.write();
+  }
 }
+
 initDB();
 
 app.use(express.json());
