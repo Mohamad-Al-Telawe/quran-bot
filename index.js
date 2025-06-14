@@ -1,6 +1,8 @@
-const TelegramBot = require('node-telegram-bot-api');
-const express = require('express');
-const { Low, JSONFile } = require('lowdb');
+import TelegramBot from 'node-telegram-bot-api';
+import express from 'express';
+import { Low } from 'lowdb';
+import { JSONFile } from 'lowdb/node';
+
 const app = express();
 
 const token = process.env.TOKEN;
