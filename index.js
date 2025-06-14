@@ -1,92 +1,71 @@
-import TelegramBot from 'node-telegram-bot-api';
-import express from 'express';
-import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
+const TelegramBot = require('node-telegram-bot-api');
+const fs = require('fs');
 
-const app = express();
-
-// ✅ التوكن مكتوب مباشرة
-const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A';
+const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A'; // ضع التوكن هنا مباشرة
 const bot = new TelegramBot(token, { polling: true });
 
-// إعداد قاعدة البيانات
-const adapter = new JSONFile('./db.json');
-const db = new Low(adapter);
+const DB_FILE = 'db.json';
 
-// تحميل البيانات أو إنشاؤها
-async function initDB() {
-  await db.read();
-  if (!db.data) {
-    db.data = { students: [] }; // البيانات الافتراضية
-    await db.write();
+
+// تحميل قاعدة البيانات من ملف
+function loadDB() {
+  if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify({ students: [] }, null, 2));
   }
+
+  const data = fs.readFileSync(DB_FILE);
+  return JSON.parse(data);
 }
 
-await initDB();
-
-app.use(express.json());
-
-// API لإضافة النقاط من خارج البوت (اختياري)
-app.post('/add-points', async (req, res) => {
-  const { studentId, points } = req.body;
-  await addPoints(studentId, points);
-  res.send({ status: 'تم الحفظ' });
-});
-
-// تشغيل السيرفر
-app.listen(3000, () => {
-  console.log('✅ Server running on port 3000');
-});
-
-// دالة لإضافة النقاط
-async function addPoints(studentId, points) {
-  await db.read();
-  let student = db.data.students.find(s => s.id === studentId);
-  if (!student) {
-    student = { id: studentId, totalPoints: 0 };
-    db.data.students.push(student);
-  }
-  student.totalPoints += points;
-  await db.write();
+// حفظ قاعدة البيانات إلى ملف
+function saveDB(data) {
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
 }
 
-// استقبال الرسائل: إدخال النقاط
-bot.on('message', async (msg) => {
+// إضافة نقاط لطالب
+function addPoints(studentId, points) {
+  const db = loadDB();
+  let student = db.students.find(s => s.id === studentId);
+
+  if (student) {
+    student.totalPoints += points;
+  } else {
+    db.students.push({ id: studentId, totalPoints: points });
+  }
+
+  saveDB(db);
+}
+
+// فحص نقاط طالب
+function getPoints(studentId) {
+  const db = loadDB();
+  const student = db.students.find(s => s.id === studentId);
+  return student ? student.totalPoints : null;
+}
+
+// استقبال الرسائل بصيغة: 1234 10
+bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text;
+  const text = msg.text.trim();
+  const parts = text.split(' ');
 
-  // تجاهل الأوامر مثل /check
-  if (text.startsWith('/')) return;
-
-  const parts = text.trim().split(' ');
-  if (parts.length !== 2) {
-    bot.sendMessage(chatId, '❌ أرسل الرسالة بالشكل: رقم_الطالب عدد_النقاط\nمثال: 1234 5');
-    return;
+  if (parts.length === 2 && !isNaN(parts[1])) {
+    const studentId = parts[0];
+    const points = parseInt(parts[1]);
+    addPoints(studentId, points);
+    bot.sendMessage(chatId, `✅ تمت إضافة ${points} نقطة للطالب رقم ${studentId}`);
   }
-
-  const studentId = parts[0];
-  const points = parseInt(parts[1]);
-
-  if (isNaN(points)) {
-    bot.sendMessage(chatId, '❌ عدد النقاط يجب أن يكون رقمًا.');
-    return;
-  }
-
-  await addPoints(studentId, points);
-  bot.sendMessage(chatId, `✅ تمت إضافة ${points} نقطة للطالب رقم ${studentId}`);
 });
 
-// عرض نقاط الطالب: /check 1234
-bot.onText(/\/check (\d+)/, async (msg, match) => {
+// أمر فحص النقاط: /check 1234
+bot.onText(/\/check (\d+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const studentId = match[1];
+  const points = getPoints(studentId);
 
-  await db.read();
-  const student = db.data.students.find(s => s.id === studentId);
-
-  if (!student) {
-    bot.sendMessage(chatId, '❌ الطالب غير موجود.');
+  if (points !== null) {
+    bot.sendMessage(chatId, `📌 الطالب رقم ${studentId} لديه ${points} نقطة.`);
   } else {
-    bot.sendMessage(chatId, `📊 الطالب رقم ${studentId} لديه ${student.totalPoints} نقطة.`);
+    bot.sendMessage(chatId, '❌ الطالب غير موجود.');
   }
 });
