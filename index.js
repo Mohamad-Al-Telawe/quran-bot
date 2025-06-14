@@ -2,58 +2,43 @@ import TelegramBot from 'node-telegram-bot-api';
 import express from 'express';
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
-import fs from 'fs';
 
 const app = express();
 
-// ✅ التحقق من وجود التوكن
-const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A';
-if (!token) {
-  console.error('❌ متغير TOKEN غير موجود. تأكد من إضافته في Railway > Variables');
-  process.exit(1);
-}
+// ✅ التوكن مكتوب مباشرة
+const token = 'ضع_توكن_البوت_هنا';
+const bot = new TelegramBot(token, { polling: true });
 
-// ✅ التحقق من وجود مجلد قاعدة البيانات
-const dbFolder = './data';
-if (!fs.existsSync(dbFolder)) {
-  fs.mkdirSync(dbFolder);
-}
-
-// ✅ إعداد قاعدة البيانات
-const adapter = new JSONFile('./data/db.json');
+// إعداد قاعدة البيانات
+const adapter = new JSONFile('./db.json');
 const db = new Low(adapter);
 
+// تحميل البيانات أو إنشاؤها
 async function initDB() {
   await db.read();
   if (!db.data) {
-    db.data = { students: [] };
+    db.data = { students: [] }; // البيانات الافتراضية
     await db.write();
   }
 }
 
-await initDB(); // التأكد من جاهزية قاعدة البيانات قبل تشغيل البوت
-
-const bot = new TelegramBot(token, { polling: true });
+await initDB();
 
 app.use(express.json());
 
-// ✅ استقبال بيانات من API خارجي (اختياري)
+// API لإضافة النقاط من خارج البوت (اختياري)
 app.post('/add-points', async (req, res) => {
   const { studentId, points } = req.body;
-  if (!studentId || typeof points !== 'number') {
-    return res.status(400).send({ error: 'بيانات غير صحيحة' });
-  }
   await addPoints(studentId, points);
   res.send({ status: 'تم الحفظ' });
 });
 
-// ✅ تشغيل السيرفر على المنفذ الصحيح
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+// تشغيل السيرفر
+app.listen(3000, () => {
+  console.log('✅ Server running on port 3000');
 });
 
-// ✅ دالة لإضافة النقاط
+// دالة لإضافة النقاط
 async function addPoints(studentId, points) {
   await db.read();
   let student = db.data.students.find(s => s.id === studentId);
@@ -65,15 +50,17 @@ async function addPoints(studentId, points) {
   await db.write();
 }
 
-// ✅ التعامل مع رسائل البوت
+// استقبال الرسائل: إدخال النقاط
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
-  // الشكل المتوقع: 1234 5
-  const parts = text.split(' ');
+  // تجاهل الأوامر مثل /check
+  if (text.startsWith('/')) return;
+
+  const parts = text.trim().split(' ');
   if (parts.length !== 2) {
-    bot.sendMessage(chatId, 'أرسل الرسالة بالشكل: رقم_الطالب عدد_النقاط');
+    bot.sendMessage(chatId, '❌ أرسل الرسالة بالشكل: رقم_الطالب عدد_النقاط\nمثال: 1234 5');
     return;
   }
 
@@ -81,7 +68,7 @@ bot.on('message', async (msg) => {
   const points = parseInt(parts[1]);
 
   if (isNaN(points)) {
-    bot.sendMessage(chatId, 'عدد النقاط يجب أن يكون رقمًا.');
+    bot.sendMessage(chatId, '❌ عدد النقاط يجب أن يكون رقمًا.');
     return;
   }
 
@@ -89,7 +76,7 @@ bot.on('message', async (msg) => {
   bot.sendMessage(chatId, `✅ تمت إضافة ${points} نقطة للطالب رقم ${studentId}`);
 });
 
-// ✅ أمر عرض النقاط
+// عرض نقاط الطالب: /check 1234
 bot.onText(/\/check (\d+)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const studentId = match[1];
@@ -98,7 +85,7 @@ bot.onText(/\/check (\d+)/, async (msg, match) => {
   const student = db.data.students.find(s => s.id === studentId);
 
   if (!student) {
-    bot.sendMessage(chatId, 'الطالب غير موجود.');
+    bot.sendMessage(chatId, '❌ الطالب غير موجود.');
   } else {
     bot.sendMessage(chatId, `📊 الطالب رقم ${studentId} لديه ${student.totalPoints} نقطة.`);
   }
