@@ -3,7 +3,7 @@ const express = require('express');
 const { Low, JSONFile } = require('lowdb');
 const app = express();
 
-const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A';
+const token = process.env.TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 
 // إعداد قاعدة البيانات
