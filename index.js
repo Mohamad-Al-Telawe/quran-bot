@@ -6,7 +6,7 @@ import { JSONFile } from 'lowdb/node';
 const app = express();
 
 // ✅ التوكن مكتوب مباشرة
-const token = 'ضع_توكن_البوت_هنا';
+const token = '8037606268:AAHXAjdNZiVN0yCknhW1vFhBzSRvJPK9U_A';
 const bot = new TelegramBot(token, { polling: true });
 
 // إعداد قاعدة البيانات
