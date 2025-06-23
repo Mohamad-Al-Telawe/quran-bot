@@ -1,0 +1,36 @@
+[
+  {
+    "studentId": "1007",
+    "page": 84,
+    "tajweedScore": 4,
+    "memorizationScore": 3,
+    "type": "جديد",
+    "teacherId": 1096559813,
+    "teacherName": "farhadalomar",
+    "date": "2025-06-22T06:32:40.260Z",
+    "studentName": "يوسف خراز"
+  },
+  {
+    "studentId": "9999",
+    "page": 231,
+    "tajweedScore": 1,
+    "memorizationScore": 2,
+    "type": "جديد",
+    "teacherId": 929274921,
+    "teacherName": "MohamadAltelawe",
+    "date": "2025-06-22T06:32:40.262Z",
+    "studentName": "Test"
+  },
+  {
+    "studentId": "1007",
+    "page": 85,
+    "tajweedScore": 4,
+  
+    "memorizationScore": 5,
+    "type": "جديد",
+    "teacherId": 1096559813,
+    "teacherName": "farhadalomar",
+    "date": "2025-06-22T07:03:45.309Z",
+    "studentName": "أحمد رجوب"
+  }
+]

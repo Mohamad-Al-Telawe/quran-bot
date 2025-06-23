@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة نقاط الطلاب اليومية</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+  <div class="container">
+    <h1>📊 لوحة متابعة النقاط اليومية</h1>
+
+    <div class="filters">
+      <label>من تاريخ: <input type="date" id="fromDate" /></label>
+      <label>إلى تاريخ: <input type="date" id="toDate" /></label>
+      <button onclick="filterData()">عرض</button>
+    </div>
+
+    <table id="resultsTable">
+      <thead>
+        <!-- يُملأ برمجيًا -->
+      </thead>
+      <tbody>
+        <!-- يُملأ برمجيًا -->
+      </tbody>
+    </table>
+  </div>
+<canvas id="pointsChart" width="600" height="300"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>

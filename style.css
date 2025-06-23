@@ -1,0 +1,76 @@
+body {
+   font-family: 'El Messiri', sans-serif;
+   direction: rtl;
+   background-color: #f2f2f2;
+   margin: 0;
+   padding: 0;
+}
+
+.container {
+   max-width: 800px;
+   margin: 40px auto;
+   background-color: white;
+   padding: 20px;
+   border-radius: 12px;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+   text-align: center;
+   margin-bottom: 20px;
+   color: #333;
+}
+
+.filters {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 20px;
+   gap: 10px;
+   flex-wrap: wrap;
+}
+
+.filters label {
+   flex: 1 1 45%;
+}
+
+button {
+   background-color: #4caf50;
+   color: white;
+   border: none;
+   padding: 10px 16px;
+   border-radius: 6px;
+   cursor: pointer;
+   font-size: 16px;
+}
+
+button:hover {
+   background-color: #45a049;
+}
+
+table {
+   width: 100%;
+   border-collapse: collapse;
+}
+
+table th,
+table td {
+   border: 1px solid #ddd;
+   padding: 12px;
+   text-align: center;
+}
+
+table th {
+   background-color: #4caf50;
+   color: white;
+}
+/* 🎨 تنسيق الرسم البياني */
+canvas {
+   max-width: 100%;
+   height: 400px;
+   margin-top: 30px;
+   direction: ltr; /* ضروري لعرض الرسم بشكل صحيح */
+   background-color: #ffffff;
+   border-radius: 8px;
+   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+   padding: 10px;
+}
